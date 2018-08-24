@@ -1,4 +1,5 @@
 import negative_cycle as nc
+from random import randrange
 
 
 def test_parse_input():
@@ -16,16 +17,25 @@ def test_parse_input():
 
 
 def test_node():
-    node = nc.Node(0)
-    assert type(node) == nc.Node
-    assert node.num == 0
+    node_0 = nc.Node(0)
+    assert type(node_0) == nc.Node
+    assert node_0.num == 0
 
-    node_2 = nc.Node(1)
-    node.add_connection(node_2, 1)
-    assert node_2 in node.connections
-    node_2.update_dist_from_source(node, node.connections[node_2])
-    assert node in node_2._dist_from_source
-    assert node_2.get_dist_from_source(node) == 1
+    nodes = [node_0]
+    for i in range(1, 5):
+        nodes.append(nc.Node(i))
+
+    edge_weights = []
+    for i in range(4):
+        edge_weights.append(randrange(1, 10))
+
+    for i in range(4):
+        nodes[i].add_connection(nodes[i+1], edge_weights[i])
+
+    assert nodes[1] in nodes[0].connections
+    assert nodes[0].dist_from_self[nodes[1]] == edge_weights[0]
+    assert nodes[2] not in nodes[0].connections
+    assert nodes[1].dist_from_self[nodes[2]] == edge_weights[1]
 
 
 def test_build_graph():
@@ -57,3 +67,10 @@ def test_negative_cycle():
     nodes = nc.build_graph(num_nodes, edges)
 
     assert nc.negative_cycle(nodes) == 0
+
+
+if __name__ == '__main__':
+    test_parse_input()
+    test_node()
+    test_build_graph()
+    test_negative_cycle()

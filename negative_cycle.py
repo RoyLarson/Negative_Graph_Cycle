@@ -15,9 +15,9 @@ class Node:
         self.connections[node] = distance
         self.dist_from_self[node] = distance
 
-    def update_dist_from_self(self, source_node):
-        dist_from_source = self.dist_from_self[source_node]
-        for node, edge_dist in source_node.connections.items():
+    def update_dist_from_self(self, current_node):
+        dist_from_source = self.dist_from_self[current_node]
+        for node, edge_dist in current_node.connections.items():
             dist_to_node = dist_from_source+edge_dist
             if (self.dist_from_self[node] is None or
                     self.dist_from_self[node] > dist_to_node):
