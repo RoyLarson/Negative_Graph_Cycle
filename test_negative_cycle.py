@@ -60,13 +60,13 @@ def test_negative_cycle():
     num_nodes, edges = nc.parse_input(positive_test)
     nodes = nc.build_graph(num_nodes, edges)
 
-    assert nc.negative_cycle(nodes) == 1
+    assert nc.negative_cycle(nodes)
 
     negative_test = [4, 4, 1, 2, 5, 4, 1, 2, 2, 3, 2, 3, 1, 1]
     num_nodes, edges = nc.parse_input(negative_test)
     nodes = nc.build_graph(num_nodes, edges)
 
-    assert nc.negative_cycle(nodes) == 0
+    assert not nc.negative_cycle(nodes)
 
 
 if __name__ == '__main__':

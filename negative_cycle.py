@@ -10,26 +10,47 @@ class Node:
         self.num = node_num
         self.connections = dict()
         self.dist_from_self = dict()
+        self.updated = False
 
     def add_connection(self, node, distance):
         self.connections[node] = distance
         self.dist_from_self[node] = distance
 
     def update_dist_from_self(self, current_node):
-        dist_from_source = self.dist_from_self[current_node]
-        for node, edge_dist in current_node.connections.items():
-            dist_to_node = dist_from_source+edge_dist
-            if (self.dist_from_self[node] is None or
-                    self.dist_from_self[node] > dist_to_node):
-                self.dist_from_self[node] = dist_to_node
+        self.updated = False
+        try:
+            dist_from_source = self.dist_from_self[current_node]
+        except KeyError:
+            return
+        else:
+            for node, edge_dist in current_node.connections.items():
+                dist_to_node = dist_from_source+edge_dist
+                if (self.dist_from_self[node] is None or
+                        self.dist_from_self[node] > dist_to_node):
+                    self.dist_from_self[node] = dist_to_node
+                    self.updated = True
 
     def __repr__(self):
         return 'Node({})'.format(self.num)
 
 
 def negative_cycle(nodes):
-    for source in nodes:
-        continue
+    nlist = nodes[:]
+    source = nlist.pop()
+    source.dist_from_self[source] = 0
+    while not source.connections:
+        source = nlist.pop()
+
+    for i in range(len(nlist)):
+        queue = []
+        queue.append(*source.connections)
+        q_index = 0
+        while q_index < len(queue):
+            source.update_dist_from_self(queue[q_index])
+            queue.append(*queue[q_index].connections)
+            q_index += 1
+
+    return source.updated
 
 
 def build_graph(num_nodes, edges):
