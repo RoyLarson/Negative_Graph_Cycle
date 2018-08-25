@@ -33,7 +33,6 @@ def test_node():
         nodes[i].add_connection(nodes[i+1], edge_weights[i])
 
     assert nodes[1] in nodes[0].connections
-    assert nodes[0].dist_from_self[nodes[1]] == edge_weights[0]
     assert nodes[2] not in nodes[0].connections
 
 
