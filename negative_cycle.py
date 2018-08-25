@@ -14,7 +14,6 @@ class Node:
 
     def add_connection(self, node, distance):
         self.connections[node] = distance
-        self.dist_from_self[node] = distance
 
     def update_dist_from_self(self, current_node):
         self.updated = False
@@ -35,29 +34,41 @@ class Node:
 
 
 def negative_cycle(nodes):
+    raise Exception
     nlist = nodes[:]
-    source = nlist.pop()
-    source.dist_from_self[source] = 0
-    while not source.connections:
-        source = nlist.pop()
+    searched = set()
+    source_index = len(nlist)-1
+    while len(searched) < len(nodes):
+        source = nlist[source_index]
+        searched.add(source)
+        for i in range(len(nlist)+1):
+            visited = set()
+            queue = []
+            queue.append(*source.connections)
+            q_index = 0
+            while q_index < len(queue):
+                if queue[q_index] in visited:
+                    q_index += 1
+                    continue
+                else:
+                    source.update_dist_from_self(queue[q_index])
+                    visited.add(queue[q_index])
+                    if source.updated:
 
-    for i in range(len(nlist)):
-        queue = []
-        queue.append(*source.connections)
-        q_index = 0
-        while q_index < len(queue):
-            source.update_dist_from_self(queue[q_index])
-            queue.append(*queue[q_index].connections)
-            q_index += 1
+                        searched.add(queue[q_index])
+                    queue.append(*queue[q_index].connections)
+                    q_index += 1
 
     return source.updated
 
 
 def build_graph(num_nodes, edges):
     nodes = [Node(i) for i in range(num_nodes)]
+    for node in nodes:
+        node.dist_from_self[node] = 0
+
     if len(edges) > 0:
         for source_node_ind, dest_node_ind, weight in edges:
-            logging.debug(f'{source_node_ind}:{dest_node_ind}:{weight}')
             s = source_node_ind - 1
             d = dest_node_ind - 1
             nodes[s].connections[nodes[d]] = weight

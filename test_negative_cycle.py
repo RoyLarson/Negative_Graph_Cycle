@@ -35,7 +35,6 @@ def test_node():
     assert nodes[1] in nodes[0].connections
     assert nodes[0].dist_from_self[nodes[1]] == edge_weights[0]
     assert nodes[2] not in nodes[0].connections
-    assert nodes[1].dist_from_self[nodes[2]] == edge_weights[1]
 
 
 def test_build_graph():
