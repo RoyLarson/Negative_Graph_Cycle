@@ -1,8 +1,8 @@
 # Uses python3
 
 import sys
-import logging
-logging.basicConfig(level=logging.DEBUG, filename='debug.log')
+#import logging
+#logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 
 
 class Node:
@@ -33,36 +33,59 @@ class Node:
     def __repr__(self):
         return 'Node({})'.format(self.num)
 
+    def __lt__(self, other):
+        return self.num < other.num
+
+
+def bfs(source):
+    an_update = False
+    visited = set()
+    queue = [source]
+    q_index = 0
+    while q_index < len(queue):
+        current_node = queue[q_index]
+        if current_node in visited:
+            q_index += 1
+            continue
+        else:
+            source.update_dist_from_self(current_node)
+            if source.updated:
+                an_update = True
+            visited.add(current_node)
+            try:
+                queue.extend(current_node.connections)
+            except TypeError as err:
+                print(err)
+
+            q_index += 1
+    return visited, an_update
+
+
+def bellman_ford(source, num_nodes):
+
+    n_times_to_bfs = num_nodes+1
+    for i in range(n_times_to_bfs):
+        an_update = False
+        searched, an_update = bfs(source)
+        if not an_update:
+            break
+
+    return searched, an_update
+
 
 def negative_cycle(nodes):
-    nlist = nodes[:]
+    num_nodes = len(nodes)
     nodeset = set(nodes)
     searched = set()
-    while len(searched) < len(nodes):
-        not_searched = list(nodeset.difference(searched))
+    while len(searched) < num_nodes:
+        not_searched = sorted(list(nodeset.difference(searched)))
         source = not_searched[0]
-        for i in range(len(nlist)+1):
-            an_update = False
-            visited = set()
-            queue = [source]
-            q_index = 0
-            while q_index < len(queue):
-                current_node = queue[q_index]
-                if current_node in visited:
-                    q_index += 1
-                    continue
-                else:
-                    source.update_dist_from_self(current_node)
-                    visited.add(current_node)
-                    if source.updated:
-                        an_update = True
-                        searched.add(current_node)
-                    queue.append(*current_node.connections)
-                    q_index += 1
-            if not an_update:
-                break
+        new_searched, an_update = bellman_ford(source, num_nodes)
+        searched = searched.union(new_searched)
+        if an_update:
+            break
 
-    return source.updated
+    return an_update
 
 
 def build_graph(num_nodes, edges):
@@ -91,5 +114,8 @@ if __name__ == '__main__':
     data = list(map(int, input.split()))
     num_nodes, edges = parse_input(data)
     nodes = build_graph(num_nodes, edges)
-
-    print(negative_cycle(nodes))
+    negative = negative_cycle(nodes)
+    if negative:
+        print(1)
+    else:
+        print(0)
