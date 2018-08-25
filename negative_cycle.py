@@ -41,7 +41,7 @@ def negative_cycle(nodes):
     while len(searched) < len(nodes):
         not_searched = list(nodeset.difference(searched))
         source = not_searched[0]
-        for i in range(len(nlist)):
+        for i in range(len(nlist)+1):
             an_update = False
             visited = set()
             queue = [source]
