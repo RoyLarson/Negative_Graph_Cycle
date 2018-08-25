@@ -17,15 +17,16 @@ class Node:
 
     def update_dist_from_self(self, current_node):
         self.updated = False
-        try:
-            dist_from_source = self.dist_from_self[current_node]
-        except KeyError:
-            return
-        else:
-            for node, edge_dist in current_node.connections.items():
-                dist_to_node = dist_from_source+edge_dist
-                if (self.dist_from_self[node] is None or
-                        self.dist_from_self[node] > dist_to_node):
+        current_dist_from_self = self.dist_from_self[current_node]
+        for node, edge_dist in current_node.connections.items():
+            dist_to_node = current_dist_from_self+edge_dist
+            try:
+                self.dist_from_self[node]
+            except KeyError:
+                self.dist_from_self[node] = dist_to_node
+                self.updated = True
+            else:
+                if dist_to_node < self.dist_from_self[node]:
                     self.dist_from_self[node] = dist_to_node
                     self.updated = True
 
@@ -34,30 +35,32 @@ class Node:
 
 
 def negative_cycle(nodes):
-    raise Exception
     nlist = nodes[:]
+    nodeset = set(nodes)
     searched = set()
-    source_index = len(nlist)-1
     while len(searched) < len(nodes):
-        source = nlist[source_index]
-        searched.add(source)
-        for i in range(len(nlist)+1):
+        not_searched = list(nodeset.difference(searched))
+        source = not_searched[0]
+        for i in range(len(nlist)):
+            an_update = False
             visited = set()
-            queue = []
-            queue.append(*source.connections)
+            queue = [source]
             q_index = 0
             while q_index < len(queue):
-                if queue[q_index] in visited:
+                current_node = queue[q_index]
+                if current_node in visited:
                     q_index += 1
                     continue
                 else:
-                    source.update_dist_from_self(queue[q_index])
-                    visited.add(queue[q_index])
+                    source.update_dist_from_self(current_node)
+                    visited.add(current_node)
                     if source.updated:
-
-                        searched.add(queue[q_index])
-                    queue.append(*queue[q_index].connections)
+                        an_update = True
+                        searched.add(current_node)
+                    queue.append(*current_node.connections)
                     q_index += 1
+            if not an_update:
+                break
 
     return source.updated
 
@@ -77,7 +80,6 @@ def build_graph(num_nodes, edges):
 
 
 def parse_input(data):
-
     num_nodes, _ = data[:2]
     edges = list(
         zip(data[2::3], data[3::3], data[4::3]))

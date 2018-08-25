@@ -68,7 +68,7 @@ def test_negative_cycle():
 
 
 if __name__ == '__main__':
-    test_parse_input()
-    test_node()
-    test_build_graph()
+    #    test_parse_input()
+    #    test_node()
+    #    test_build_graph()
     test_negative_cycle()
